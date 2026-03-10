@@ -2,9 +2,32 @@
 #include <stdlib.h>
 
 typedef struct {
-    double nota;
-    double frequencia;
+    double nota, frequencia;
 } Aluno;
+
+typedef struct {
+	Aluno aluno;
+	struct No* proximo;
+} No;
+
+No* inserir_inicio(No* primeiro, Aluno aluno) {
+	No* novo_no = malloc(sizeof(No));
+	
+	novo_no->aluno = aluno;
+	novo_no->proximo = primeiro;
+	
+	return novo_no;
+}
+
+void libera_lista(No* primeiro) {
+    No* temp;
+
+    while (primeiro != NULL) {
+        temp = primeiro;
+        primeiro = primeiro->proximo;
+        free(temp);
+    }
+}
 
 int main() {
 
@@ -12,21 +35,26 @@ int main() {
     double soma;
     i = aprovados = reprovados_ambos = reprovados_nota = reprovados_frequencia = soma = 0;
     
-    Aluno* alunos = calloc(30, sizeof(Aluno));
+    No* primeiro = NULL;
+    Aluno aluno;
 
     for (i = 0; i < 30; i++) {
-        scanf("%lf %lf\n", &alunos[i].nota, &alunos[i].frequencia);
-        soma += alunos[i].nota;
+        scanf("%lf %lf", &aluno.nota, &aluno.frequencia);
+        soma += aluno.nota;
+        primeiro = inserir_inicio(primeiro, aluno);
 
-        if (alunos[i].nota < 6.0 && alunos[i].frequencia < 75) reprovados_ambos++;
-        else if (alunos[i].nota < 6.0) reprovados_nota++;
-        else if (alunos[i].frequencia < 75) reprovados_frequencia++;
+        if (aluno.nota < 6.0 && aluno.frequencia < 75) reprovados_ambos++;
+        else if (aluno.nota < 6.0) reprovados_nota++;
+        else if (aluno.frequencia < 75) reprovados_frequencia++;
         else aprovados++;
     }
 
     printf("Media geral da turma: %.2lf\n", soma / 30.0);
-    printf("Alunos aprovados: %d\nAlunos reprovados por nota: %d\nAlunos reprovados por frequencia: %d\nAlunos reprovados por nota e frequencia: %d\n", aprovados, reprovados_nota, reprovados_frequencia, reprovados_ambos);
-    free(alunos);
+    printf("Alunos aprovados: %d\n", aprovados);
+    printf("Alunos reprovados por nota: %d\n", reprovados_nota);
+    printf("Alunos reprovados por frequencia: %d\n", reprovados_frequencia);
+    printf("Alunos reprovados por nota e frequencia: %d\n", reprovados_ambos);
+    libera_lista(primeiro);
 
     return 0;
 }
